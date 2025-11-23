@@ -1,0 +1,9 @@
+/build/
+/build-*/
+/fuzz/corpus-work/
+crash-*
+leak-*
+timeout-*
+oom-*
+*.o
+*.a
