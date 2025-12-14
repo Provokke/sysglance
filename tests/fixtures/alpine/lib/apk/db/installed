@@ -1,0 +1,11 @@
+C:Q1abc=
+P:musl
+V:1.2.5-r0
+
+C:Q1def=
+P:busybox
+V:1.36.1-r29
+
+C:Q1ghi=
+P:alpine-baselayout
+V:3.6.5-r0

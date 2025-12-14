@@ -1,0 +1,112 @@
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1200.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 0
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1300.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 1
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1400.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 2
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1500.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 3
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 4
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1600.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 0
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 5
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1700.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 1
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 6
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1800.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 2
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+
+processor	: 7
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 140
+model name	: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+stepping	: 1
+cpu MHz		: 1900.000
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 8
+core id		: 3
+cpu cores	: 4
+flags		: fpu vme de pse tsc msr
+

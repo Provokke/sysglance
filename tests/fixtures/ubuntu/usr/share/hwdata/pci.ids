@@ -1,0 +1,7 @@
+# tiny pci.ids excerpt for tests
+8086  Intel Corporation
+	9a14  11th Gen Core Processor Host Bridge
+	9a49  TigerLake-LP GT2 [Iris Xe Graphics]
+		1028 0a1f  Iris Xe on some laptop
+10de  NVIDIA Corporation
+	2484  GA104 [GeForce RTX 3070]

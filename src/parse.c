@@ -188,6 +188,33 @@ void sg_clean_cpu_name(char *s)
 
 #define MAX_CORE_IDS 1024
 
+/* ARM Ltd. (implementer 0x41) part numbers -> marketing names, for kernels
+ * that don't print a "model name" on arm64. */
+static const char *arm_part_name(unsigned part)
+{
+    switch (part) {
+    case 0xd03: return "Cortex-A53";
+    case 0xd04: return "Cortex-A35";
+    case 0xd05: return "Cortex-A55";
+    case 0xd07: return "Cortex-A57";
+    case 0xd08: return "Cortex-A72";
+    case 0xd09: return "Cortex-A73";
+    case 0xd0a: return "Cortex-A75";
+    case 0xd0b: return "Cortex-A76";
+    case 0xd0c: return "Neoverse-N1";
+    case 0xd0d: return "Cortex-A77";
+    case 0xd40: return "Neoverse-V1";
+    case 0xd41: return "Cortex-A78";
+    case 0xd44: return "Cortex-X1";
+    case 0xd46: return "Cortex-A510";
+    case 0xd47: return "Cortex-A710";
+    case 0xd48: return "Cortex-X2";
+    case 0xd49: return "Neoverse-N2";
+    case 0xd4f: return "Neoverse-V2";
+    default: return NULL;
+    }
+}
+
 int sg_parse_cpuinfo(const char *text, sg_cpuinfo *c)
 {
     memset(c, 0, sizeof *c);
@@ -195,6 +222,7 @@ int sg_parse_cpuinfo(const char *text, sg_cpuinfo *c)
     static const char *const model_keys[] = {"model name", "Hardware", "Processor",
                                              "cpu model", "uarch", "cpu"};
     int model_prio = 99;
+    unsigned implementer = 0, part = 0;
     int phys = -1, core = -1;
     static const int max_ids = MAX_CORE_IDS;
     long *ids = malloc(sizeof(long) * MAX_CORE_IDS);
@@ -241,6 +269,14 @@ int sg_parse_cpuinfo(const char *text, sg_cpuinfo *c)
             core = atoi(v);
             continue;
         }
+        if (!strcmp(k, "CPU implementer")) {
+            implementer = (unsigned)strtoul(v, NULL, 0);
+            continue;
+        }
+        if (!strcmp(k, "CPU part")) {
+            part = (unsigned)strtoul(v, NULL, 0);
+            continue;
+        }
         if (!strcmp(k, "cpu MHz") || !strcmp(k, "clock")) {
             double mhz = strtod(v, NULL);
             if (mhz > c->mhz_max)
@@ -256,6 +292,8 @@ int sg_parse_cpuinfo(const char *text, sg_cpuinfo *c)
     }
     c->physical_cores = (have_topology && nids > 0) ? nids : c->logical;
     free(ids);
+    if (!c->model[0] && implementer == 0x41 && arm_part_name(part))
+        snprintf(c->model, sizeof c->model, "ARM %s", arm_part_name(part));
     if (c->model[0])
         sg_clean_cpu_name(c->model);
     return (c->model[0] || c->logical) ? 0 : -1;
@@ -335,7 +373,7 @@ void sg_format_bytes(unsigned long long bytes, char *out, size_t cap)
     static const char *const units[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"};
     double v = (double)bytes;
     int u = 0;
-    while (v >= 1024.0 && u < 6) {
+    while (v >= 1023.995 && u < 6) { /* avoid "1024.00 MiB" after rounding */
         v /= 1024.0;
         u++;
     }
