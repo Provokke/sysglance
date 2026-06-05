@@ -132,8 +132,13 @@ static int m_os(sg_entry *e, int max)
     sg_osrel o;
     if (sg_detect_os(&o) < 0)
         return 0;
-    struct utsname u;
-    const char *arch = uname(&u) == 0 ? u.machine : "";
+    /* kernel.arch sysctl (Linux 5.x+) is root-relative, so fixtures can set it */
+    char arch[64] = "";
+    if (sg_read_line("/proc/sys/kernel/arch", arch, sizeof arch) <= 0) {
+        struct utsname u;
+        if (uname(&u) == 0)
+            sg_strlcpy(arch, u.machine, sizeof arch);
+    }
     sg_entry_init(e, "OS");
     snprintf(e->value, sizeof e->value, "%s%s%s", o.pretty_name, *arch ? " " : "", arch);
     sg_field_str(e, "name", o.name);

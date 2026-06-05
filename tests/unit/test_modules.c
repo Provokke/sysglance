@@ -66,7 +66,8 @@ static void test_mod_os(void)
     CHECK_CONTAINS(E[0].value, "Ubuntu 24.04.1 LTS");
     CHECK_STR(field(&E[0], "id"), "\"ubuntu\"");
     CHECK_INT(run_mod("fedora", "os"), 1); /* /usr/lib/os-release fallback */
-    CHECK_CONTAINS(E[0].value, "Fedora Linux 40");
+    CHECK_STR(E[0].value, "Fedora Linux 40 (Workstation Edition) aarch64");
+    CHECK_STR(field(&E[0], "arch"), "\"aarch64\"");
     CHECK_INT(run_mod("alpine", "os"), 1);
     CHECK_CONTAINS(E[0].value, "Alpine Linux v3.20");
     CHECK_INT(run_mod("empty", "os"), 0);
