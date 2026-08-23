@@ -82,7 +82,7 @@ check-compilers:
 fuzz:
 	@mkdir -p build-fuzz fuzz/corpus-work
 	clang $(WARN) -O1 -g -Isrc -fsanitize=fuzzer,address,undefined \
-	    fuzz/fuzz_config.c src/config.c src/util.c -o build-fuzz/fuzz_config
+	    fuzz/fuzz_config.c src/config.c src/util.c src/parse.c -o build-fuzz/fuzz_config
 	cp -n fuzz/corpus/* fuzz/corpus-work/ 2>/dev/null || true
 	./build-fuzz/fuzz_config -max_total_time=$(FUZZ_TIME) -max_len=4096 \
 	    fuzz/corpus-work fuzz/corpus

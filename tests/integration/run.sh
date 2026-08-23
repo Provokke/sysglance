@@ -20,8 +20,17 @@ pass=0 fail=0
 ok()  { pass=$((pass + 1)); printf 'ok     - %s\n' "$1"; }
 bad() { fail=$((fail + 1)); printf 'not ok - %s\n' "$1"; [ -n "${2:-}" ] && printf '         %s\n' "$2"; }
 
+# Any sanitizer / valgrind report is a failure on its own, whatever the
+# individual check looks at.
+scan() { # file context
+    if grep -qE 'Sanitizer|runtime error:|ERROR SUMMARY: [1-9]|definitely lost|Invalid (read|write)' "$1"; then
+        bad "memory checker clean: $2" "$(grep -m3 -E 'Sanitizer|runtime error|ERROR SUMMARY|lost|Invalid' "$1")"
+    fi
+    if [ "${rc:-0}" -eq 99 ]; then bad "valgrind error exit: $2"; fi
+}
+
 # run ARGS... -> sets $rc, output in $TMP/out, $TMP/err
-run() { $WRAP "$BIN" "$@" >"$TMP/out" 2>"$TMP/err"; rc=$?; }
+run() { $WRAP "$BIN" "$@" >"$TMP/out" 2>"$TMP/err"; rc=$?; scan "$TMP/err" "$*"; }
 
 expect_rc() { # name rc
     if [ "$rc" -eq "$2" ]; then ok "$1"; else bad "$1" "exit $rc, expected $2; stderr: $(head -c 300 "$TMP/err")"; fi
@@ -61,11 +70,11 @@ run --color --no-color; has_esc && bad "--no-color after --color disables color"
 run --no-color; has_esc && bad "--no-color has no escape codes" || ok "--no-color has no escape codes"
 printf '[display]\ncolor = true\n' > "$TMP/color.ini"
 run --config "$TMP/color.ini"; has_esc && ok "config color=true enables color" || bad "config color=true enables color"
-NO_COLOR=1 $WRAP "$BIN" --config "$TMP/color.ini" >"$TMP/out" 2>&1
+NO_COLOR=1 $WRAP "$BIN" --config "$TMP/color.ini" >"$TMP/out" 2>&1; rc=$?; scan "$TMP/out" NO_COLOR
 has_esc && bad "NO_COLOR overrides config color=true" || ok "NO_COLOR overrides config color=true"
-NO_COLOR=1 $WRAP "$BIN" --color >"$TMP/out" 2>&1
+NO_COLOR=1 $WRAP "$BIN" --color >"$TMP/out" 2>&1; rc=$?; scan "$TMP/out" NO_COLOR
 has_esc && ok "explicit --color overrides NO_COLOR" || bad "explicit --color overrides NO_COLOR"
-NO_COLOR= $WRAP "$BIN" --config "$TMP/color.ini" >"$TMP/out" 2>&1
+NO_COLOR= $WRAP "$BIN" --config "$TMP/color.ini" >"$TMP/out" 2>&1; rc=$?; scan "$TMP/out" NO_COLOR
 has_esc && ok "empty NO_COLOR is ignored" || bad "empty NO_COLOR is ignored"
 if command -v script >/dev/null 2>&1; then
     script -qec "$WRAP $BIN --modules os" /dev/null >"$TMP/out" 2>&1 </dev/null
@@ -131,7 +140,7 @@ assert v("loadavg") == "0.52, 0.58, 0.59"
 assert v("processes") == "4"
 assert v("title") == "tester@fixture-ubuntu", v("title")
 PY
-SYSGLANCE_ROOT="$FIX/arch" $WRAP "$BIN" --json --modules os,cpu,packages,swap >"$TMP/out" 2>"$TMP/err"
+SYSGLANCE_ROOT="$FIX/arch" $WRAP "$BIN" --json --modules os,cpu,packages,swap >"$TMP/out" 2>"$TMP/err"; rc=$?; scan "$TMP/err" SYSGLANCE_ROOT
 python3 -I - "$TMP/out" <<'PY' && ok "SYSGLANCE_ROOT env (arch)" || bad "SYSGLANCE_ROOT env (arch)"
 import json, sys
 d = {m["name"]: m["entries"][0]["value"] for m in json.load(open(sys.argv[1]))["modules"]}
@@ -207,7 +216,7 @@ run --modules "$(printf 'kernel,%.0s' $(seq 1 63))kernel" --json; expect_rc "64 
 huge=$(head -c 3000 /dev/zero | tr '\0' 'x')
 run --modules "$huge"; expect_rc "huge module list rejected" 2
 if [ -w /dev/full ]; then
-    $WRAP "$BIN" >/dev/full 2>"$TMP/err"; rc=$?
+    $WRAP "$BIN" >/dev/full 2>"$TMP/err"; rc=$?; scan "$TMP/err" /dev/full
     expect_rc "write error (/dev/full) exits 1" 1
 fi
 run positional; expect_rc "positional argument rejected" 2
