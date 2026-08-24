@@ -1,0 +1,141 @@
+.TH SYSGLANCE 1 "2026-11-05" "sysglance 0.1.0" "User Commands"
+.SH NAME
+sysglance \- show system information at a glance, quickly
+.SH SYNOPSIS
+.B sysglance
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+.B sysglance
+prints information about the running Linux system (distribution, kernel,
+CPU, GPU, memory, disks, packages and more) next to an ASCII logo.
+All information is read directly from
+.IR /proc ,
+.IR /sys ,
+.I /etc/os-release
+and a few system calls; no external programs are executed.
+A typical run takes well under five milliseconds.
+.SH OPTIONS
+.TP
+.BR \-m ", " \-\-modules " " \fILIST\fR
+Comma separated list of modules to show, in order.
+Duplicates are allowed. See
+.BR \-\-list\-modules .
+.TP
+.BR \-l ", " \-\-list\-modules
+List available modules with a short description and exit.
+.TP
+.B \-\-list\-logos
+List available logos and the distribution ids they are used for.
+.TP
+.BR \-j ", " \-\-json
+Print machine readable JSON instead of the logo and text.
+.TP
+.B \-\-no\-color
+Disable colored output.
+.TP
+.B \-\-color
+Force colored output, even if standard output is not a terminal and
+.B NO_COLOR
+is set.
+.TP
+.B \-\-no\-logo
+Do not print the logo.
+.TP
+.BI \-\-logo " NAME"
+Use the named logo instead of auto-detecting one.
+.B none
+disables the logo.
+.TP
+.BR \-c ", " \-\-config " " \fIFILE\fR
+Read configuration from
+.IR FILE .
+It is an error if the file cannot be read.
+.TP
+.B \-\-no\-config
+Do not read the default configuration file.
+.TP
+.BI \-\-root " DIR"
+Read every system file below
+.I DIR
+instead of
+.IR / .
+Intended for testing against fixture trees.
+.TP
+.BR \-V ", " \-\-version
+Print the version and exit.
+.TP
+.BR \-h ", " \-\-help
+Print a usage summary and exit.
+.PP
+Options taking a value also accept the
+.BI \-\-option= value
+form.
+.SH MODULES
+title, os, host, kernel, uptime, packages, shell, terminal, cpu, gpu, memory,
+swap, disk, localip, battery, loadavg, processes, locale, user, hostname.
+Modules whose data is unavailable (for example
+.B battery
+on a desktop) are silently omitted from text output and reported with
+.B \(dqavailable\(dq: false
+in JSON output.
+.SH CONFIGURATION
+The default configuration file is
+.I $XDG_CONFIG_HOME/sysglance/config.ini
+or
+.I ~/.config/sysglance/config.ini
+if
+.B XDG_CONFIG_HOME
+is unset. It is optional. Command line options override it.
+.PP
+.nf
+# comments start with # or ;
+[display]
+color = auto          # auto | true | false
+logo = true
+logo_name = auto      # auto | none | a name from \-\-list\-logos
+separator = ": "      # quotes keep leading/trailing spaces
+key_color = auto      # auto | red | bright\-blue | ...
+json = false
+
+[modules]
+list = title, os, kernel, cpu, memory
+.fi
+.PP
+Unknown sections, keys or values are reported with their line number and
+make sysglance exit with status 1.
+.SH ENVIRONMENT
+.TP
+.B NO_COLOR
+If set to a non-empty value, colors are disabled unless
+.B \-\-color
+is given.
+.TP
+.B SYSGLANCE_ROOT
+Same as
+.BR \-\-root .
+.TP
+.BR USER ", " SHELL ", " TERM ", " TERM_PROGRAM ", " LC_ALL ", " LANG
+Used by the user, shell, terminal and locale modules.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Configuration error or write error.
+.TP
+.B 2
+Invalid command line usage (unknown option, module or logo).
+.SH EXAMPLES
+.nf
+sysglance
+sysglance \-\-modules os,kernel,memory \-\-no\-logo
+sysglance \-\-json | python3 \-m json.tool
+NO_COLOR=1 sysglance > info.txt
+.fi
+.SH SEE ALSO
+.BR uname (1),
+.BR free (1),
+.BR df (1),
+.BR proc (5),
+.BR os-release (5)

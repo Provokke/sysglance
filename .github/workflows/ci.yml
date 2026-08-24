@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.cc }} / test + sanitizers
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y valgrind python3
+      - name: Build (-Wall -Wextra -Werror)
+        run: make -j2
+      - name: Unit + integration tests
+        run: make test
+      - name: AddressSanitizer + UBSan
+        run: make sanitize-test
+      - name: Valgrind
+        if: matrix.cc == 'gcc'
+        run: make valgrind-test
+      - name: Install to staging dir
+        run: |
+          make install DESTDIR="$PWD/stage" PREFIX=/usr
+          test -x stage/usr/bin/sysglance
+          test -f stage/usr/share/man/man1/sysglance.1
+          stage/usr/bin/sysglance --version
+      - name: Sample output
+        run: ./build/sysglance && ./build/sysglance --json
+      - name: Benchmark
+        run: RUNS=200 make bench
+
+  cmake:
+    name: cmake build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B cmake-build -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build cmake-build -j2
+      - run: ctest --test-dir cmake-build --output-on-failure
+
+  fuzz:
+    name: libFuzzer (config + parsers, 60s)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang runtime
+        run: sudo apt-get update && sudo apt-get install -y clang libclang-rt-dev || sudo apt-get install -y clang
+      - run: make fuzz FUZZ_TIME=60

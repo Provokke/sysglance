@@ -12,6 +12,7 @@ WARN     := -std=c11 -Wall -Wextra -Werror -Wshadow -Wpointer-arith \
             -Wstrict-prototypes -Wmissing-prototypes -Wformat=2 -Wundef
 CFLAGS   ?=
 LDFLAGS  ?=
+LDLIBS   ?= -lm
 ALL_CFLAGS := $(WARN) $(OPT) $(CFLAGS) -Isrc
 
 LIB_SRC := src/util.c src/parse.c src/config.c src/modules.c src/logo.c
@@ -48,10 +49,10 @@ $(BUILD)/libsg.a: $(LIB_OBJ)
 	$(AR) rcs $@ $^
 
 $(BIN): $(BUILD)/main.o $(BUILD)/libsg.a
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(TEST_BIN): $(TEST_OBJ) $(BUILD)/libsg.a
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(BENCH_BIN): tests/bench.c
 	@mkdir -p $(dir $@)
@@ -101,4 +102,4 @@ uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/sysglance $(DESTDIR)$(MANDIR)/sysglance.1
 
 clean:
-	rm -rf build build-san build-vg build-gcc build-clang build-fuzz fuzz/corpus-work
+	rm -rf build build-san build-vg build-gcc build-clang build-fuzz build-cmake fuzz/corpus-work
