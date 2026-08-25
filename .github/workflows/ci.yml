@@ -53,5 +53,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install clang runtime
-        run: sudo apt-get update && sudo apt-get install -y clang libclang-rt-dev || sudo apt-get install -y clang
+        run: sudo apt-get update && (sudo apt-get install -y clang libclang-rt-18-dev || sudo apt-get install -y clang)
       - run: make fuzz FUZZ_TIME=60
