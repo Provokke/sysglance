@@ -1,15 +1,14 @@
+<div align="center">
+
 # sysglance
 
 A lightning-fast system information tool for Linux, written in C11.
 
-`sysglance` prints your distribution, kernel, CPU, GPU, memory, disks,
-package counts and more next to an ASCII logo — in about **1.8 ms**
-(roughly 0.8 ms above the cost of spawning any process at all). It reads
-`/proc`, `/sys`, `/etc/os-release` and a handful of syscalls directly and
-**never runs external programs**.
+![License](https://img.shields.io/badge/LICENSE-MIT-blue?style=for-the-badge)  ![Language](https://img.shields.io/badge/C11-555555?style=for-the-badge)
 
-It is an original project in the spirit of neofetch/fastfetch: original code,
-original logos, no shared code.
+Refer to [LICENSE](LICENSE) for the legal bits.
+
+</div>
 
 ## Sample output
 
@@ -25,13 +24,13 @@ and keys are colored in the distribution's colors):
  (   |  /       \  |   Uptime: 21 mins
 (   )  |       |   |   Packages: 914 (dpkg)
  '-' \  \       /  /   Shell: bash
-     '. '-----' .___   Terminal: claude
+     '. '-----' .___   Terminal: xterm-256color
        '-.....-(   )   CPU: Intel Xeon Processor (4) @ 2.30 GHz
                 '-'    Memory: 1.03 GiB / 15.71 GiB (7%)
                        Swap: Disabled
                        Disk (/): 13.96 GiB / 251.97 GiB (36%) - ext4
-                       Disk (/opt/claude-code): 320.08 MiB / 353.23 MiB (92%) - ext4
-                       Disk (/opt/env-runner): 31.84 MiB / 48.48 MiB (67%) - ext4
+                       Disk (/opt/app): 320.08 MiB / 353.23 MiB (92%) - ext4
+                       Disk (/opt/runner): 31.84 MiB / 48.48 MiB (67%) - ext4
                        Local IP (eth0): 192.0.2.2/24
                        Load: 2.54, 1.69, 0.95
                        Processes: 90
@@ -113,7 +112,7 @@ Alpine on a Raspberry Pi fixture:
 }
 ```
 
-## Building
+## 🚀 Quick start
 
 Requirements: a C11 compiler (gcc or clang), GNU make, Linux.
 
@@ -130,7 +129,7 @@ An optional CMake build is also provided:
 cmake -S . -B build-cmake && cmake --build build-cmake && ctest --test-dir build-cmake
 ```
 
-## Usage
+### CLI
 
 ```
 Usage: sysglance [OPTIONS]
@@ -206,7 +205,7 @@ output and reported as `"available": false` in JSON.
 `total_bytes`, `percent`, `cores_logical`. The schema is enforced by
 `tests/integration/check_json.py`.
 
-## Configuration
+## ⚙️ Configuration
 
 Optional file at `$XDG_CONFIG_HOME/sysglance/config.ini` (or
 `~/.config/sysglance/config.ini`), or any file given with `--config`.
@@ -231,7 +230,7 @@ Sections and keys are case-insensitive. Any unknown section, key or invalid
 value is a hard error that names the line (`config.ini: line 4: invalid
 boolean for logo`) so typos never go unnoticed.
 
-## Performance
+## ⏱️ Benchmarks
 
 `make bench` runs [hyperfine](https://github.com/sharkdp/hyperfine) when it is
 installed and otherwise falls back to the bundled fork/exec +
@@ -252,7 +251,7 @@ The target was < 5 ms; the actual information gathering costs well under
 `$USER` is unset, package counting by directory listing instead of parsing
 package databases, and a single pass over each `/proc` file.
 
-## Testing
+## 🧪 Testing
 
 ```sh
 make test             # unit tests + integration tests
@@ -289,7 +288,7 @@ All logos are original ASCII drawings made for this project
 `src/logo_data.inc`). They are matched against `ID`, then `ID_LIKE`, from
 os-release. Unknown distributions get the sysglance "eye" logo.
 
-## Known limitations
+## ⚠️ Honest limits
 
 * Linux only. It has not been built or tested on other kernels, and would
   report very little there (everything comes from `/proc` and `/sys`).
@@ -304,6 +303,6 @@ os-release. Unknown distributions get the sysglance "eye" logo.
 * Shell versions are not shown (that would require running the shell).
 * Terminal detection is heuristic (parent process name).
 
-## License
+## Licence
 
 MIT — see [LICENSE](LICENSE).
